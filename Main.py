@@ -14,6 +14,16 @@ y = 30
 man = pygame.image.load('man.png')
 man = pygame.transform.scale(man, (200, 200))
 
+# Load image
+image = pygame.image.load('man.png')
+# Set the size for the image
+DEFAULT_IMAGE_SIZE = (35, 60)
+# Scale the image to your needed size
+image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
+# Set a default position
+DEFAULT_IMAGE_POSITION = (200,200)
+
+
 
 # The player variables have been replaced by a pygame.Rect.
 player = pygame.Rect(40, 45, 10, 10)
@@ -62,6 +72,8 @@ while run:
     pygame.draw.rect(win, SQUARECOLOR, player,)
     rect = man.get_rect()
     rect = rect.move((x, y))
+
+    win.blit(image, DEFAULT_IMAGE_POSITION)
 
     # Use a for loop to draw the wall rects.
     for wall in walls:
