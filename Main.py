@@ -11,9 +11,8 @@ x = 20
 y = 30
 
 
-man = pygame.image.load('man.png')
-man = pygame.transform.scale(man, (200, 200))
-
+man_png = pygame.image.load("man.png").convert()
+man = man_png.get_rect()
 # Load image
 image = pygame.image.load('man.png')
 # Set the size for the image
@@ -67,11 +66,14 @@ while run:
 
             # Then quit or restart.
 
+        if player.Rect() == man.Rect() :
+            player = pygame.Rect(40, 45, 10, 10)
+            print('Game over')
+
+
     # Draw everything.
     win.fill(BLACK)
-    pygame.draw.rect(win, SQUARECOLOR, player,)
-    rect = man.get_rect()
-    rect = rect.move((x, y))
+    pygame.draw.rect(win, SQUARECOLOR, player)
 
     win.blit(image, DEFAULT_IMAGE_POSITION)
 
@@ -79,7 +81,7 @@ while run:
     for wall in walls:
         pygame.draw.rect(win, WHITE, wall)
 
-    pygame.display.update()
+    pygame.display.flip()
     clock.tick(60)  # Limit the frame rate to 60 FPS.
 
 pygame.quit()
