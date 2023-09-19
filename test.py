@@ -215,7 +215,30 @@ class RandEnemy(pygame.sprite.Sprite):
 
     def getPosition(self, x, y):
         return x, y
+class Hero(pygame.sprite.Sprite):
+    def __init__(self, color, width, height):
 
+        super().__init__()
+
+        self.image = pygame.image.load('man.png')
+        self.image = pygame.Surface((width, height))
+        self.image.fill(red)
+        self.image.set_colorkey(red)
+
+        pygame.draw.rect(self.image, red, [0, 0, width, height],1)
+        self.rect = self.image.get_rect()
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+    def right(self, pixels):
+        self.rect.x += pixels
+    def left(self, pixels):
+        self.rect.x -= pixels
+    def up(self, pixels):
+        self.rect.y -= pixels
+    def down(self, pixels):
+        self.rect.y += pixels
 
 # DEFINE POSTITIONS AND SPEEDS
 
@@ -294,8 +317,8 @@ player1 = Player(player_POS_x,player_POS_y,10,10)
 playerList.add(player1)
 allSpriteList.add(player1)
 
-star = pygame.image.load('man.png').convert_alpha()
-star.pygame.pygame.transform.scale(Surface, 30, 40)
+# star = pygame.image.load('man.png').convert_alpha()
+# star.pygame.pygame.transform.scale(Surface, 30, 40)
 
 
 # MAIN GAME LOOP
@@ -363,7 +386,7 @@ while not gameExit:
     # Draw objects
     gameDisplay.fill(black)
     allSpriteList.draw(gameDisplay)
-    screen.blit(star, (x, y))
+    # screen.blit(star, (x, y))
 
     pygame.display.update()
     pygame.display.flip()
