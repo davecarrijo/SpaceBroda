@@ -59,6 +59,31 @@ enemyRect = image.get_rect(topleft = DEFAULT_IMAGE_POSITION )
 player = pygame.Rect(40, 45, 10, 10)
 FolowerEnemy = pygame.Rect(F_enemy_x, F_Enemy_y, 10, 10)
 
+
+# !
+class Tile(pygame.sprite.Sprite):
+
+    def __init__(self, position):
+        super().__init__()
+        self.image = pygame.Surface((50, 50))
+        self.color = GREEN
+        self.image.fill(self.color)
+        self.rect = self.image.get_rect(topleft=position)
+
+    def change_color(self, color):
+        self.color = color
+        self.image.fill(self.color)
+
+def main():
+    screen = pygame.display.set_mode((800, 600))
+    clock = pygame.time.Clock()
+    all_sprites = pygame.sprite.Group()
+    # Create the tiles and add them to the all_sprites group.
+    for y in range(10):
+        for x in range(12):
+            all_sprites.add(Tile((x*51, y*51)))
+# !
+
 # The walls are now pygame.Rects as well. Just put them into a list.
 walls = [
     pygame.Rect(0, 0, 1200, 5),
@@ -73,7 +98,6 @@ enemys  = [
     pygame.Rect(50, rand_y_2, 10, 10),
     ]
 
-
 #?Loop
 #start the game
 run = True
@@ -83,9 +107,8 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-
     # Update the player coordinates.
-    keys = pygame.key.get_pressed()
+    keys = pygame.key.get_pressed()pull
     if keys[pygame.K_LEFT] and player.x > 0:
         player.x -= PlayerSpeed
     elif keys[pygame.K_RIGHT] and player.x < 1200 - player.width:
@@ -96,6 +119,7 @@ while run:
         player.y += PlayerSpeed
     elif keys[pygame.K_r]:
         player = pygame.Rect(40, 45, 30, 30)
+
 
     # Game logic.
     for wall in walls:
@@ -128,12 +152,13 @@ while run:
         win.fill(RED)
 
 
-    win.fill(BLACK)
+
     ##main char
     pygame.draw.rect(win, SQUARECOLOR, player)
     # Show the image and vilain
     pygame.draw.rect(win, RED, FolowerEnemy)
 >>>>>>> e00d5801438c2d4fceb1eb6373ca99e580e77a9f
+
 
     win.blit(image, DEFAULT_IMAGE_POSITION)
     # Use a for loop to draw the wall rects.
@@ -150,4 +175,7 @@ while run:
     pygame.display.flip()
     clock.tick(60)  # Limit the frame rate to 60 FPS.
 
-pygame.quit()
+if __name__ == '__main__':
+    pygame.init()
+    main()
+    pygame.quit()

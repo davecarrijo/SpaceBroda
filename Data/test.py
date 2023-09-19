@@ -1,4 +1,5 @@
-import pygame,sys
+import pygame
+import sys
 import random
 import math
 from pygame.locals import *
@@ -17,8 +18,8 @@ SQUARECOLOR = (20,60,120)
 
 #Screen width
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 400
+SCREEN_HEIGHT = 400
 
 
 ##POS's
@@ -186,6 +187,11 @@ wall = Wall (0,590,1000,300)
 wall_list.add(wall)
 all_sprite_list.add(wall)
 
+enemies = [
+    Player(50,50),
+    Player(10,10),
+    Player(10,50),
+]
 
 #Create the player
 player = Player(50,50)
@@ -244,19 +250,20 @@ while not done:
 
 
 
-        ##main char
-        pygame.draw.rect(win, SQUARECOLOR, player)
-        # Show the image and vilain
-        pygame.draw.rect(win, RED, FolowerEnemy)
+        # ##main char
+        # pygame.draw.rect(win, SQUARECOLOR, player)
+        # # Show the image and vilain
+        # pygame.draw.rect(win, RED, FolowerEnemy)
 
-        win.blit(image, DEFAULT_IMAGE_POSITION)
-        # Use a for loop to draw the wall rects.
-        for wall in walls:
-            pygame.draw.rect(win, WHITE, wall)
-        # Use a for loop to draw the wall rects.
-        for enemy in enemys:
-            pygame.draw.rect(win, WHITE, enemy)
+        # # Use a for loop to draw the wall rects.
+        # for wall in walls:
+        #     pygame.draw.rect(win, WHITE, wall)
+        # # Use a for loop to draw the wall rects.
+        # for enemy in enemys:
+        #     pygame.draw.rect(win, WHITE, enemy)
 
+
+    win.blit(image, DEFAULT_IMAGE_POSITION)
 
     win.fill(BLACK)
     all_sprite_list.draw(win)
