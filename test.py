@@ -215,30 +215,25 @@ class RandEnemy(pygame.sprite.Sprite):
 
     def getPosition(self, x, y):
         return x, y
-class Hero(pygame.sprite.Sprite):
-    def __init__(self, color, width, height):
 
-        super().__init__()
+class Hero(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height):
+
+        pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.image.load('man.png')
-        self.image = pygame.Surface((width, height))
-        self.image.fill(red)
-        self.image.set_colorkey(red)
-
-        pygame.draw.rect(self.image, red, [0, 0, width, height],1)
         self.rect = self.image.get_rect()
+        pygame.draw.rect(self.image, RED, [0, 0, width, height],1)
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+        self.image = pygame.Surface([width, height])
+        self.image.fill(purple)
 
-    def right(self, pixels):
-        self.rect.x += pixels
-    def left(self, pixels):
-        self.rect.x -= pixels
-    def up(self, pixels):
-        self.rect.y -= pixels
-    def down(self, pixels):
-        self.rect.y += pixels
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def draw(self, gameDisplay):
+        gameDisplay.blit(self.image, self.rect)
 
 # DEFINE POSTITIONS AND SPEEDS
 
@@ -262,6 +257,7 @@ randEnemysList = pygame.sprite.Group()
 wallList = pygame.sprite.Group()
 npcList = pygame.sprite.Group()
 enemyList = pygame.sprite.Group()
+heroList = pygame.sprite.Group()
 allSpriteList = pygame.sprite.Group()
 
 # Walls
@@ -316,6 +312,10 @@ allSpriteList.add(enemy2)
 player1 = Player(player_POS_x,player_POS_y,10,10)
 playerList.add(player1)
 allSpriteList.add(player1)
+#hero
+newHero = Hero(30,100,20,30)
+heroList.add(newHero)
+allSpriteList.add(newHero)
 
 # star = pygame.image.load('man.png').convert_alpha()
 # star.pygame.pygame.transform.scale(Surface, 30, 40)
@@ -386,7 +386,6 @@ while not gameExit:
     # Draw objects
     gameDisplay.fill(black)
     allSpriteList.draw(gameDisplay)
-    # screen.blit(star, (x, y))
 
     pygame.display.update()
     pygame.display.flip()
