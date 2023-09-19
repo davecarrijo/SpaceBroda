@@ -294,8 +294,8 @@ player1 = Player(player_POS_x,player_POS_y,10,10)
 playerList.add(player1)
 allSpriteList.add(player1)
 
-star = pygame.image.load('man.png').convert_alpha()
-star.pygame.pygame.transform.scale(Surface, 30, 40)
+# star = pygame.image.load('man.png').convert_alpha()
+# star.pygame.pygame.transform.scale(Surface, 30, 40)
 
 
 # MAIN GAME LOOP
@@ -363,7 +363,7 @@ while not gameExit:
     # Draw objects
     gameDisplay.fill(black)
     allSpriteList.draw(gameDisplay)
-    screen.blit(star, (x, y))
+    # screen.blit(star, (x, y))
 
     pygame.display.update()
     pygame.display.flip()

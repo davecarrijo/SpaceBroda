@@ -1,19 +1,50 @@
 import pygame
+import random
+import math
+from pygame.locals import *
+
+#COLORS
+BLUE = (10,10,128)
+RED = (255,0,0)
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+SQUARECOLOR = (20,60,120)
+
+#Screen width
+SCREEN_WIDTH = 300
+SCREEN_HEIGHT = 300
+
+# Vel of the player,game
+PlayerSpeed = 8
+EnemySpeed = 5
+
+##POS's
+x = 20
+y = 30
+F_enemy_x = 170
+F_Enemy_y = 45
+
+#Rand enemys POS
+rand_x = random.randint(20,280)
+rand_y = random.randint(20,280)
+rand_x_2 = random.randint(20,280)
+rand_y_2 = random.randint(20,280)
 
 
 pygame.init()
-win = pygame.display.set_mode((300, 300))
+win = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH))
 clock = pygame.time.Clock()  # A clock to limit the frame rate.
-BLACK = (0, 0, 0)
-WHITE = (255,255,255)
-SQUARECOLOR = (20, 60, 120)
-x = 20
-y = 30
 
 
+<<<<<<< HEAD
 man_png = pygame.image.load("man.png").convert()
 man = man_png.get_rect()
 # Load image
+=======
+# # # Load image
+man = pygame.image.load('man.png')
+man = pygame.transform.scale(man, (200, 200))
+>>>>>>> e00d5801438c2d4fceb1eb6373ca99e580e77a9f
 image = pygame.image.load('man.png')
 # Set the size for the image
 DEFAULT_IMAGE_SIZE = (35, 60)
@@ -21,12 +52,13 @@ DEFAULT_IMAGE_SIZE = (35, 60)
 image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 # Set a default position
 DEFAULT_IMAGE_POSITION = (200,200)
-
+enemyRect = image.get_rect(topleft = DEFAULT_IMAGE_POSITION )
 
 
 # The player variables have been replaced by a pygame.Rect.
 player = pygame.Rect(40, 45, 10, 10)
-vel = 7
+FolowerEnemy = pygame.Rect(F_enemy_x, F_Enemy_y, 10, 10)
+
 # The walls are now pygame.Rects as well. Just put them into a list.
 walls = [
     pygame.Rect(0, 0, 1200, 5),
@@ -34,7 +66,16 @@ walls = [
     pygame.Rect(0, 295, 1200, 5),
     pygame.Rect(295, 0, 5, 600),
     ]
+enemys  = [
+    pygame.Rect(rand_x, rand_y, 10, 10),
+    pygame.Rect(rand_x_2, rand_y_2, 10, 10),
+    pygame.Rect(170, rand_y_2, 10, 10),
+    pygame.Rect(50, rand_y_2, 10, 10),
+    ]
 
+
+#?Loop
+#start the game
 run = True
 while run:
     # Handle the events.
@@ -42,20 +83,19 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-    keys = pygame.key.get_pressed()
 
     # Update the player coordinates.
+    keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and player.x > 0:
-        player.x -= vel
-    if keys[pygame.K_RIGHT] and player.x < 1200 - player.width:
-        player.x += vel
-    if keys[pygame.K_UP] and player.y > 0:
-        player.y -= vel
-    if keys[pygame.K_DOWN] and player.y < 600 - player.height:
-        player.y += vel
-    if keys[pygame.K_r]:
+        player.x -= PlayerSpeed
+    elif keys[pygame.K_RIGHT] and player.x < 1200 - player.width:
+        player.x += PlayerSpeed
+    elif keys[pygame.K_UP] and player.y > 0:
+        player.y -= PlayerSpeed
+    elif keys[pygame.K_DOWN] and player.y < 600 - player.height:
+        player.y += PlayerSpeed
+    elif keys[pygame.K_r]:
         player = pygame.Rect(40, 45, 30, 30)
-
 
     # Game logic.
     for wall in walls:
@@ -63,9 +103,16 @@ while run:
         if player.colliderect(wall):
             player = pygame.Rect(40, 45, 10, 10)
             print('Game over')
-
+            # Then quit or restart.
+    # Game logic.
+    for enemy in enemys:
+        # Check if the player rect collides with a enemy rect.
+        if player.colliderect(enemy):
+            player = pygame.Rect(40, 45, 10, 10)
+            print('Game over')
             # Then quit or restart.
 
+<<<<<<< HEAD
         if player.Rect() == man.Rect() :
             player = pygame.Rect(40, 45, 10, 10)
             print('Game over')
@@ -74,13 +121,32 @@ while run:
     # Draw everything.
     win.fill(BLACK)
     pygame.draw.rect(win, SQUARECOLOR, player)
+=======
+    if player.colliderect(enemyRect):
+        player = pygame.Rect(40, 45, 10, 10)
+        print('Game over')
+        win.fill(RED)
+
+
+    win.fill(BLACK)
+    ##main char
+    pygame.draw.rect(win, SQUARECOLOR, player)
+    # Show the image and vilain
+    pygame.draw.rect(win, RED, FolowerEnemy)
+>>>>>>> e00d5801438c2d4fceb1eb6373ca99e580e77a9f
 
     win.blit(image, DEFAULT_IMAGE_POSITION)
-
     # Use a for loop to draw the wall rects.
     for wall in walls:
         pygame.draw.rect(win, WHITE, wall)
+    # Use a for loop to draw the wall rects.
+    for enemy in enemys:
+        pygame.draw.rect(win, WHITE, enemy)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> e00d5801438c2d4fceb1eb6373ca99e580e77a9f
     pygame.display.flip()
     clock.tick(60)  # Limit the frame rate to 60 FPS.
 
