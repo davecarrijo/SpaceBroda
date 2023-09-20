@@ -1,181 +1,397 @@
-import pygame
+# INITIALIZE
+from math import pi, sin, cos, atan2
 import random
-import math
-from pygame.locals import *
+import pygame
 
-#COLORS
-BLUE = (10,10,128)
-RED = (255,0,0)
-BLACK = (0,0,0)
-WHITE = (255,255,255)
-SQUARECOLOR = (20,60,120)
 
-#Screen width
-SCREEN_WIDTH = 300
-SCREEN_HEIGHT = 300
+def get_angle(origin, destination):
+    """Returns angle in radians from origin to destination.
+        This is the angle that you would get if the points were
+        on a cartesian grid. Arguments of (0,0), (1, -1)
+        return pi/4 (45 deg) rather than  7/4.
+        """
+    x_dist = destination[0] - origin[0]
+    y_dist = destination[1] - origin[1]
+    return atan2(-y_dist, x_dist) % (2 * pi)
 
-# Vel of the player,game
-PlayerSpeed = 8
-EnemySpeed = 5
 
-##POS's
-x = 20
-y = 30
-F_enemy_x = 170
-F_Enemy_y = 45
+def project(pos, angle, distance):
+    """
+    Returns tuple of pos projected distance at angle
+    adjusted for pygame's y-axis.
+
+    EXAMPLES
+
+    Move a sprite using it's angle and speed
+    new_pos = project(sprite.pos, sprite.angle, sprite.speed)
+
+    Find the relative x and y components of an angle and speed
+    x_and_y = project((0, 0), angle, speed)
+    """
+    return (pos[0] + (cos(angle) * distance),
+            pos[1] - (sin(angle) * distance))
+
+
+pygame.mixer.pre_init(44100,16,2,4096)
+pygame.init()
+
+clock = pygame.time.Clock()
+FPS = 60
+
+white = (255,255,255)
+black = (000,000,000)
+RED = (255,000,000)
+green = (000,255,000)
+blue = (000,000,255)
+purple = (255,000,255)
+
+npcHitSound = 'sound.mp3'
+enemyHitSound = 'tePeguei.mp3'
+
+displayWidth = 900
+displayHeight = 900
+gameDisplay = pygame.display.set_mode((displayWidth,displayHeight))
+pygame.display.set_caption('SpaceBrodar')
 
 #Rand enemys POS
-rand_x = random.randint(20,280)
-rand_y = random.randint(20,280)
-rand_x_2 = random.randint(20,280)
-rand_y_2 = random.randint(20,280)
+rand_x = random.randint(20,850)
+rand_y = random.randint(20,850)
+rand_x_2 = random.randint(20,850)
+rand_y_2 = random.randint(20,850)
+
+# CLASSES
+
+class Wall(pygame.sprite.Sprite):
+
+    def __init__(self, x, y, width, height):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.Surface([width, height])
+        self.image.fill(white)
+
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
 
 
-pygame.init()
-win = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH))
-clock = pygame.time.Clock()  # A clock to limit the frame rate.
+class Player(pygame.sprite.Sprite):
+
+    player_x_change = 0
+    player_y_change = 0
+
+    def __init__(self, x, y, width, height):
+
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.Surface([width, height])
+        self.image.fill(white)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self, x, y):
+        self.player_x_change = x
+        self.player_y_change = y
+
+    def checkCollision(self, walls, npcs, enemies, RandEnemy):
+
+        # Walls
+
+        self.rect.x += self.player_x_change
+
+        wallHitList = pygame.sprite.spritecollide(self, walls, False)
+        for wall in wallHitList:
+            if self.player_x_change > 0:
+                self.rect.right = wall.rect.left
+            else:
+                self.rect.left = wall.rect.right
+
+        self.rect.y += self.player_y_change
+
+        wallHitList = pygame.sprite.spritecollide(self, walls, False)
+        for wall in wallHitList:
+            if self.player_y_change > 0:
+                self.rect.bottom = wall.rect.top
+            else:
+                self.rect.top = wall.rect.bottom
+
+        # NPCs
+
+        npcHitList = pygame.sprite.spritecollide(self, npcs, True)
+        if npcHitList:
+            effect = pygame.mixer.Sound(npcHitSound)
+            effect.set_volume(.25)
+            effect.play()
+            print("HIT")
+
+        # Enemies
+
+        enemyHitList = pygame.sprite.spritecollide(self, enemies, False)
+        if enemyHitList:
+            effect = pygame.mixer.Sound(enemyHitSound)
+            effect.set_volume(.01)
+            effect.play()
+            self.rect.x = 450
+            self.rect.y = 450
+            print("HIT")
+
+        RandEnemyHitList = pygame.sprite.spritecollide(self, RandEnemy,False)
+        if RandEnemyHitList:
+            effect = pygame.mixer.Sound(enemyHitSound)
+            effect.set_volume(.20)
+            effect.play()
+            self.rect.x = 450
+            self.rect.y = 450
+            print("HIT")
 
 
-<<<<<<< HEAD
-man_png = pygame.image.load("man.png").convert()
-man = man_png.get_rect()
-# Load image
-=======
-# # # Load image
-man = pygame.image.load('man.png')
-man = pygame.transform.scale(man, (200, 200))
->>>>>>> e00d5801438c2d4fceb1eb6373ca99e580e77a9f
-image = pygame.image.load('man.png')
-# Set the size for the image
-DEFAULT_IMAGE_SIZE = (35, 60)
-# Scale the image to your needed size
-image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
-# Set a default position
-DEFAULT_IMAGE_POSITION = (200,200)
-enemyRect = image.get_rect(topleft = DEFAULT_IMAGE_POSITION )
+    def getPosition(self, x, y):
+        print(x, y)
+        return x, y
 
 
-# The player variables have been replaced by a pygame.Rect.
-player = pygame.Rect(40, 45, 10, 10)
-FolowerEnemy = pygame.Rect(F_enemy_x, F_Enemy_y, 10, 10)
+class Npc(pygame.sprite.Sprite):
+
+    def __init__(self, x, y, width, height):
+
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.Surface([width, height])
+        self.image.fill(purple)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 
-# !
-class Tile(pygame.sprite.Sprite):
+class Enemy(pygame.sprite.Sprite):
 
-    def __init__(self, position):
-        super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.color = GREEN
-        self.image.fill(self.color)
-        self.rect = self.image.get_rect(topleft=position)
+    enemy_x_change = 0
+    enemy_y_change = 0
 
-    def change_color(self, color):
-        self.color = color
-        self.image.fill(self.color)
+    def __init__(self, x, y, width, height):
+        pygame.sprite.Sprite.__init__(self)
 
-def main():
-    screen = pygame.display.set_mode((800, 600))
-    clock = pygame.time.Clock()
-    all_sprites = pygame.sprite.Group()
-    # Create the tiles and add them to the all_sprites group.
-    for y in range(10):
-        for x in range(12):
-            all_sprites.add(Tile((x*51, y*51)))
-# !
+        self.image = pygame.Surface([width, height])
+        self.image.fill(RED)
 
-# The walls are now pygame.Rects as well. Just put them into a list.
-walls = [
-    pygame.Rect(0, 0, 1200, 5),
-    pygame.Rect(0, 0, 5, 600),
-    pygame.Rect(0, 295, 1200, 5),
-    pygame.Rect(295, 0, 5, 600),
-    ]
-enemys  = [
-    pygame.Rect(rand_x, rand_y, 10, 10),
-    pygame.Rect(rand_x_2, rand_y_2, 10, 10),
-    pygame.Rect(170, rand_y_2, 10, 10),
-    pygame.Rect(50, rand_y_2, 10, 10),
-    ]
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+        self.pos = self.rect.center
+        self.speed = .2 #pixels per millisecond
 
-#?Loop
-#start the game
-run = True
-while run:
-    # Handle the events.
+    def update(self, dt, player):
+        angle = get_angle(self.rect.center, player.rect.center)
+        self.pos = project(self.pos, angle, self.speed * dt)
+        self.rect.center = self.pos
+
+    def getPosition(self, x, y):
+        return x, y
+
+
+class RandEnemy(pygame.sprite.Sprite):
+
+    enemy_x_change = 0
+    enemy_y_change = 0
+
+    def __init__(self, x, y, width, height):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.Surface([width, height])
+        self.image.fill(white)
+
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+        self.pos = self.rect.center
+        self.speed = .2 #pixels per millisecond
+
+    def update(self, dt, player):
+        angle = get_angle(self.rect.center, player.rect.center)
+        self.pos = project(self.pos, angle, self.speed * dt)
+        self.rect.center = self.pos
+
+    def getPosition(self, x, y):
+        return x, y
+
+class Hero(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height):
+
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load('man.png')
+        self.rect = self.image.get_rect()
+        pygame.draw.rect(self.image, RED, [0, 0, width, height],1)
+
+        self.image = pygame.Surface([width, height])
+        self.image.fill(purple)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def draw(self, gameDisplay):
+        gameDisplay.blit(self.image, self.rect)
+
+# DEFINE POSTITIONS AND SPEEDS
+
+player_POS_x = displayWidth/2
+player_POS_y = displayHeight/2
+player_x_change = 0
+player_y_change = 0
+movementSpeed = 4
+# enemy POS and speed
+enemy_x_change = 0
+enemy_y_change = 0
+enemy_x = 20
+enemy_y = 20
+enemySpeed = 2
+
+
+# CREATE SPRITES
+# Sprite groups
+playerList = pygame.sprite.Group()
+randEnemysList = pygame.sprite.Group()
+wallList = pygame.sprite.Group()
+npcList = pygame.sprite.Group()
+enemyList = pygame.sprite.Group()
+heroList = pygame.sprite.Group()
+allSpriteList = pygame.sprite.Group()
+
+# Walls
+# mid bars
+wall = Wall(170,150,600,15)
+wallList.add(wall)
+allSpriteList.add(wall)
+wall = Wall(170,800,600,15)
+wallList.add(wall)
+allSpriteList.add(wall)
+#end mid bars
+# top main bar
+wall = Wall(0,0,900,10)
+wallList.add(wall)
+allSpriteList.add(wall)
+# left main bar
+wall = Wall(0,0,10,900)
+wallList.add(wall)
+allSpriteList.add(wall)
+# left main bar
+wall = Wall(890,0,10,900)
+wallList.add(wall)
+allSpriteList.add(wall)
+#bottom bar
+wall = Wall(0,890,900,10)
+wallList.add(wall)
+allSpriteList.add(wall)
+
+    #NPCs
+
+npc1 = Npc(rand_x,670,10,10)
+npcList.add(npc1)
+allSpriteList.add(npc1)
+npc2 = Npc(700,rand_y,10,10)
+npcList.add(npc2)
+allSpriteList.add(npc2)
+
+# Enemies
+enemy = Enemy(enemy_x,enemy_y,30,30)
+enemyList.add(enemy)
+allSpriteList.add(enemy)
+
+#randEnemys
+enemy1 = RandEnemy(rand_x,400,30,30)
+randEnemysList.add(enemy1)
+allSpriteList.add(enemy1)
+enemy2 = RandEnemy(300,rand_y,70,70)
+randEnemysList.add(enemy2)
+allSpriteList.add(enemy2)
+
+# Player
+player1 = Player(player_POS_x,player_POS_y,10,10)
+playerList.add(player1)
+allSpriteList.add(player1)
+#hero
+newHero = Hero(30,100,20,30)
+heroList.add(newHero)
+allSpriteList.add(newHero)
+
+# star = pygame.image.load('man.png').convert_alpha()
+# star.pygame.pygame.transform.scale(Surface, 30, 40)
+
+
+# MAIN GAME LOOP
+gameExit = False
+while not gameExit:
+    dt = clock.tick(FPS)
+    # Event Handling
+
     for event in pygame.event.get():
+        #print(event)
         if event.type == pygame.QUIT:
-            run = False
+            gameExit = True
 
-    # Update the player coordinates.
-    keys = pygame.key.get_pressed()pull
-    if keys[pygame.K_LEFT] and player.x > 0:
-        player.x -= PlayerSpeed
-    elif keys[pygame.K_RIGHT] and player.x < 1200 - player.width:
-        player.x += PlayerSpeed
-    elif keys[pygame.K_UP] and player.y > 0:
-        player.y -= PlayerSpeed
-    elif keys[pygame.K_DOWN] and player.y < 600 - player.height:
-        player.y += PlayerSpeed
-    elif keys[pygame.K_r]:
-        player = pygame.Rect(40, 45, 30, 30)
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LSHIFT:
+                movementSpeed = 3
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                player_x_change = 0
+            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                player_y_change = 0
 
 
-    # Game logic.
-    for wall in walls:
-        # Check if the player rect collides with a wall rect.
-        if player.colliderect(wall):
-            player = pygame.Rect(40, 45, 10, 10)
-            print('Game over')
-            # Then quit or restart.
-    # Game logic.
-    for enemy in enemys:
-        # Check if the player rect collides with a enemy rect.
-        if player.colliderect(enemy):
-            player = pygame.Rect(40, 45, 10, 10)
-            print('Game over')
-            # Then quit or restart.
+    key = pygame.key.get_pressed()
 
-<<<<<<< HEAD
-        if player.Rect() == man.Rect() :
-            player = pygame.Rect(40, 45, 10, 10)
-            print('Game over')
-
-
-    # Draw everything.
-    win.fill(BLACK)
-    pygame.draw.rect(win, SQUARECOLOR, player)
-=======
-    if player.colliderect(enemyRect):
-        player = pygame.Rect(40, 45, 10, 10)
-        print('Game over')
-        win.fill(RED)
+    if key[pygame.K_LSHIFT]:
+        movementSpeed = 8
+    if key[pygame.K_LEFT] and not key[pygame.K_RIGHT]:
+        player_x_change = -movementSpeed
+    if key[pygame.K_RIGHT] and not key[pygame.K_LEFT]:
+        player_x_change = movementSpeed
+    if key[pygame.K_UP] and not key[pygame.K_DOWN]:
+        player_y_change = -movementSpeed
+    if key[pygame.K_DOWN] and not key[pygame.K_UP]:
+        player_y_change = movementSpeed
+    # if key[pygame.K_r]:
 
 
 
-    ##main char
-    pygame.draw.rect(win, SQUARECOLOR, player)
-    # Show the image and vilain
-    pygame.draw.rect(win, RED, FolowerEnemy)
->>>>>>> e00d5801438c2d4fceb1eb6373ca99e580e77a9f
 
 
-    win.blit(image, DEFAULT_IMAGE_POSITION)
-    # Use a for loop to draw the wall rects.
-    for wall in walls:
-        pygame.draw.rect(win, WHITE, wall)
-    # Use a for loop to draw the wall rects.
-    for enemy in enemys:
-        pygame.draw.rect(win, WHITE, enemy)
 
-<<<<<<< HEAD
-=======
 
->>>>>>> e00d5801438c2d4fceb1eb6373ca99e580e77a9f
+    player_POS_x += player_x_change
+    player_POS_y += player_y_change
+
+
+    #if enemy_x > player_POS_x:
+    #    enemy_x_change = -enemySpeed
+    #elif enemy_x < player_POS_x:
+    #    enemy_x_change = enemySpeed
+    #if enemy_y > player_POS_y:
+    #    enemy_y_change = -enemySpeed
+    #elif enemy_y < player_POS_y:
+    #    enemy_y_change = enemySpeed
+
+    #enemy_x += enemy_x_change
+    #enemy_y += enemy_y_change
+
+
+    # Update positions
+    enemy.update(dt, player1)
+    player1.update(player_x_change,player_y_change)
+    player1.checkCollision(wallList, npcList, enemyList,randEnemysList)
+
+    # Draw objects
+    gameDisplay.fill(black)
+    allSpriteList.draw(gameDisplay)
+
+    pygame.display.update()
     pygame.display.flip()
-    clock.tick(60)  # Limit the frame rate to 60 FPS.
 
-if __name__ == '__main__':
-    pygame.init()
-    main()
-    pygame.quit()
+
+
+
+
+pygame.quit()
